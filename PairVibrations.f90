@@ -52,7 +52,7 @@
 
         n=0
         do i=1,mphon
- 
+
          read(01,*,end=100)ii,ichoose,llk1,jjk1,frag1,ek1,eqp1,eqpcorr1,   &
      &             park1,Vini,Uini,park4,park5,park6,park7,park8,zeta1
 
@@ -101,7 +101,7 @@
         do i=1,NLivelli
          ek(i)=abs(e_sp(i)-efn)
         enddo
- 
+
        else
         write(*,*)'errore:0 oppure 1!'
         stop
@@ -154,12 +154,12 @@
  120      format(2(f8.4),2x,i5,6(f10.4,2x))
  130      format(6(e12.5,2x))
 
- 
+
          diff_add= abs(Wintegrale-PairAddition)
          diff_rem= abs(Wintegrale-PairRemoval)
 
          if(diff_add.lt.emin_add)then
-      
+
           emin_add= diff_add
           GAdd=1/DispAdd(ir)
 !          write(*,*)'GAdd=',Gadd, 'PairAddition =', PairAddition
@@ -281,7 +281,7 @@
        implicit none
        real*8 :: Epho
        integer :: i
-       
+
        write(*,*)'Calculating XY for Phonon', Epho
 
        do i=1,NLivelli
@@ -322,7 +322,7 @@
            SumAdd=SumAdd+jfac*Xadd(i)**2-jfac*Yadd(i)**2.
          enddo
        endif
-       
+
         if(SumAdd.lt.0.d0.or.SumRem.lt.0.d0)then
            write(*,*)
            write(*,*)'============================================='
@@ -348,9 +348,9 @@
           write(12,105)e_sp(i),ek(i),llk(i),jjk(i),Zeta(i),Xadd(i),Yadd(i)
         endif
        enddo
-       
+
  105      format(2(f8.4),2x,2(i5),6(f10.4,2x))
- 
+
        end subroutine XY
 
        end module Stuff
@@ -364,7 +364,7 @@
        real (kind=8)       :: Sep_hole,Sep_part,Amass, PairingGap
        logical             :: flag_efn = .false.
 
-       
+
        ir_tot = ceiling(EcutFunction/dW)
        allocate (DispersionFunction(-ir_tot:ir_tot))
 
@@ -376,15 +376,15 @@
        open(unit=21,file='rct2.mas12', status='old',action = 'read')
        open(unit=51,file='outlevels.dat')
 
-       
+
        read(15,*)Amass,Znucl,    inuc
 
        call read_mass(int(Amass),Znucl,inuc,DiffAddition,DiffRemoval,Sep_hole,Sep_part,PairingGap)
-       
+
        write(*,*)'-- Separation Energy of hole and particle states =', Sep_hole,Sep_part
        write(*,*)'- Correlation Energy of Addition and Removal =', DiffAddition, DiffRemoval
        write(*,*)'------------- Pairing Gap ------------------ =',PairingGap
-       
+
        write(*,*)'New = 2, Livelli Sperimentali = 1, Livelli Self Energy = 0'
        read(*,*) icalc
 
@@ -420,7 +420,7 @@
        write(*,*)'Calculating with adjusted Fermi Energy'
 
        call disp_relation
-       
+
        call define_minima
 
        call XY1_Calculation
@@ -468,13 +468,13 @@
      subroutine define_minima
      use Stuff
      implicit none
-     
+
      integer :: i
-     
+
        write(12,*)'Pairing strength of Pair Addition and Removal phonons'
        write(12,*)'G(a=+2)=',GAdd,'G(a=-2)=',GRem
-       write(12,*) 
-       
+       write(12,*)
+
        Wintegrale=-EcutFunction+dW
        do i=-ir_tot+2,ir_tot-2
          if(i.lt.0)then   !E<0
@@ -483,8 +483,8 @@
           abs(abs(DispersionFunction(i-1)-1.d0/Grem) - abs(DispersionFunction(i+1)- 1.d0/Grem)).lt.10.*dW                        &
               )then
                write(12,*)'Ephonon-Rem',Abs(Wintegrale)
-               write(12,*)'    E                L    2J      Z           X         Y'   
-               call XY(Wintegrale)  
+               write(12,*)'    E                L    2J      Z           X         Y'
+               call XY(Wintegrale)
             endif
          else             !E>0
             if(abs(DispersionFunction(i)- 1.d0/Gadd).lt.abs(DispersionFunction(i-1)- 1.d0/Gadd).and. &
@@ -492,12 +492,12 @@
            abs(abs(DispersionFunction(i-1)-1.d0/Gadd) - abs(DispersionFunction(i+1)- 1.d0/Gadd)).lt.10.*dW                        &
               )then
                write(12,*)'Ephonon-Add',Abs(Wintegrale)
-               write(12,*)'    E                L    2J      Z           X         Y'    
-               call XY(Wintegrale)           
+               write(12,*)'    E                L    2J      Z           X         Y'
+               call XY(Wintegrale)
             endif
          endif
-         
-         
+
+
 ! Fermi Energy Check
           if(DispersionFunction(i).lt.DispersionFunction(i-1))then
              if(DispersionFunction(i).lt.DispersionFunction(i+1))then
@@ -540,7 +540,8 @@ end subroutine define_minima
        use Stuff
        implicit none
        integer :: i,j,ir, Pnum
-       real*8  :: y,Sep_part,Sep_hole,Diff_Sep
+       real*8  :: y,Sep_part,Sep_hole
+       real*8  :: ek_p,ek_h,Diff_Sep
        !------ Input Wood Saxon -------!
        integer :: Znucl,inuc
        real*8  :: Amass,r0,an0,rs0,Vson,EFP !A, Z, r0, a0, rs0 di Wood Saxon
@@ -558,8 +559,8 @@ end subroutine define_minima
 
        if(inuc.eq.1)then
           write(*,*)'Protons Pairing Vibration'
-          Vrn_p =  -51.d0 - 33.d0*(1.d0*Amass - 2.d0*Znucl)/Amass    
-          Vson  = 0.44d0*Vrn_p   
+          Vrn_p =  -51.d0 - 33.d0*(1.d0*Amass - 2.d0*Znucl)/Amass
+          Vson  = 0.44d0*Vrn_p
 
        call boundary(mphon, mphon, dr,                                &
                      Amass,Znucl,inuc,r0,rs0,An0,Vson,Vrn_p,           &
@@ -568,21 +569,21 @@ end subroutine define_minima
 
        else
           write(*,*)'Neutrons Pairing Vibration'
-   
+
           Vrn_n =  -51.d0 + 33.d0*(1.d0*Amass - 2.d0*Znucl)/Amass
-          Vson  = 0.44d0*Vrn_n 
+          Vson  = 0.44d0*Vrn_n
        call boundary(mphon, mphon, dr,                                &
                      Amass,Znucl,inuc,r0,rs0,An0,Vson,Vrn_n,           &
                         0,lmax,EcutFunction,Nbox,                     &
               PS,          Nlivelli,jjk,llk,e_sp,DVN)
 
        endif
-                
-             !WaveFunction, N, J, L , E  , V, dim vectors1, dim vectors 2 
+
+             !WaveFunction, N, J, L , E  , V, dim vectors1, dim vectors 2
        do i=1,50
           write(51,*)e_sp(i),float(llk(i)),float(jjk(i))
        enddo
-       
+
        !Sorting Secondo Energia
          do i=1,NLivelli-1
            do j=i+1,NLivelli
@@ -590,73 +591,75 @@ end subroutine define_minima
    	           y=e_sp(i)
 	           e_sp(i)=e_sp(j)
 	           e_sp(j)=y
-               
+
                y=llk(i)
                llk(i)=llk(j)
                llk(j)=y
-               
+
                y=jjk(i)
                jjk(i)=jjk(j)
                jjk(j)=y
-               
+
                DO IR=1,Nbox
                  y=PS(i,IR)
                  PS(i,IR)=PS(j,IR)
                  PS(j,IR)=y
                END DO
   	         endif
-          enddo       
+          enddo
          enddo
-       
+
        Pnum = 0
        V = 0.d0
         do i=1,NLivelli
           V(i) = 1.d0
-          Pnum = Pnum + jjk(i)+1    
-          write(*,*)llk(i),jjk(i),e_sp(i),Pnum
-          
+          Pnum = Pnum + jjk(i)+1
+!          write(*,*)llk(i),jjk(i),e_sp(i),Pnum
+
           if    (inuc.eq.0 .and. Pnum.ge.Amass-Znucl)then !neutrons
              iGapDn=i;iGapUp=i+1
              exit
           elseif(inuc.eq.1 .and. Pnum.ge.      Znucl)then !protons
-             iGapDn=i;iGapUp=i+1          
+             iGapDn=i;iGapUp=i+1
              exit
           endif
 
         enddo
-        
-        write(*,*)'Last  Occupied Level ek=',e_sp(iGapDn),'Sep_energy=',Sep_hole
-        write(*,*)'First Empty    Level ek=',e_sp(iGapUp),'Sep_energy=',Sep_part
-        
-        Diff_Sep = Sep_hole - e_sp(iGapDn)
+
+        ek_h=e_sp(iGapDn); ek_p=e_sp(iGapUp)
+        write(*,*)'Last  Occupied Level ek=',ek_h,'Sep_energy=',Sep_hole
+        write(*,*)'First Empty    Level ek=',ek_p,'Sep_energy=',Sep_part
+
+        Diff_Sep = Sep_hole - ek_h
         do i=1,iGapDn
            e_sp(i) = e_sp(i)+Diff_Sep
         enddo
-        
-        Diff_Sep = Sep_part - e_sp(iGapUp)
+
+        Diff_Sep = Sep_part - ek_p
 
         do i=iGapUp,NLivelli
            e_sp(i) = e_sp(i)+Diff_Sep
         enddo
-        
+
         efn =  (e_sp(iGapDn)+e_sp(iGapUp))/2.d0
-        
+
         write(*,*)'Fermi Energy           =',efn
-        
+
         do i=1,NLivelli
          ek(i)=abs(e_sp(i)-efn)
          if(e_sp(i).gt.EcutFunction)exit
+!         write(*,*)llk(i),jjk(i),e_sp(i),Pnum
         enddo
         NLivelli = i
-      
+
      end subroutine
-     
+
 !--------------------------------------------------------------------!
 
 !Read Masses from AME 2003 and following, remember to remove # (substitute with .)
 !Then calculates DiffAddition and DiffRemoval
 
-!Input: Amass, Znucl = A, Z of the nucleus, 
+!Input: Amass, Znucl = A, Z of the nucleus,
 !       inucl = 0, for neutron calculation, = 1 for proton calculation
 
 !Output: DiffAddition,DiffRemoval = Correlation Energy, Positive
@@ -668,10 +671,10 @@ end subroutine define_minima
        integer                          :: Atable,Ztable,Amass,Znucl,inuc
        real (kind = 8) ,dimension (5)   :: BindingE
        real (kind = 8)                  :: DiffAddition,DiffRemoval,Sep_hole,Sep_part,PairingGap
-       
-       
+
+
        character(LEN=9999) :: parkChar
-       integer             :: i, parkInt        
+       integer             :: i, parkInt
        real (kind = 8)     :: parkReal, ParkReal1,parkReal2
 
 
@@ -693,20 +696,20 @@ end subroutine define_minima
            read(20,654)parkChar,ParkInt,ParkInt,Ztable,Atable, parkChar, parkChar,ParkReal, ParkReal, BindingE(i)
            if(inuc.eq.0 .and. Atable.eq.Amass-3+i .and. Ztable.eq.Znucl    )then !neutron pairing Vibration, search for A+-2 and Z fixed
              exit
-           endif        
+           endif
            if(inuc.eq.1 .and. Atable.eq.Amass-3+i .and. Ztable.eq.Znucl-3+i)then !proton pairing Vibration, search for Z+-2 and N fixed
              exit  !if has the right mass and charge exit the inner reading cycle and associate BindingE(i) and goes to next i in the outside cycle
            endif
          enddo
        enddo
-       
-654 format (a1,i3,i5,i5,i5,1x,a3,a4,1x,f13.5,f11.5,f11.3,f9.3,1x,a2,f11.3,f9.3,1x,i3,1x,f12.5,f11.5) 
+
+654 format (a1,i3,i5,i5,i5,1x,a3,a4,1x,f13.5,f11.5,f11.3,f9.3,1x,a2,f11.3,f9.3,1x,i3,1x,f12.5,f11.5)
 
        do i=1,5
          BindingE(i) = BindingE(i)*(Amass-3+i)/1000.d0  !binding energy of nucleus in MeV
 !         write(*,*)(Amass-3+i),BindingE(i)
        enddo
-       
+
            !addition: B(A+2)-B(A)-2(B(A+1)-B(A))
        DiffAddition = BindingE(5) - BindingE(3) - 2.d0*(BindingE(4)-BindingE(3))
            !removal : B(A-2)-B(A)-2(B(A-1)-B(A))
@@ -725,19 +728,19 @@ end subroutine define_minima
              stop
           endif
        end do
-       
+
        do while (.true.) !Seach for separation energies Sep_hole,Sep_part
          read(21,'(a1,i3,a3,i5,1x,a40)')parkChar,Atable,parkChar,Ztable,parkChar!,parkReal
          if(inuc .eq. 0) then
-           if(Atable.eq.Amass .and. Ztable.eq.Znucl)then 
+           if(Atable.eq.Amass .and. Ztable.eq.Znucl)then
             if(index(trim(parkChar(1:20) ),'*').le.0)then
               read(parkChar(1:20),*)Sep_hole
             else
               write(*,*)'Neutron Separation Energy non defined, cannot calculate on the dripline'
               stop
-            endif           
+            endif
            endif
-           if(Atable.eq.Amass+1 .and. Ztable.eq.Znucl)then 
+           if(Atable.eq.Amass+1 .and. Ztable.eq.Znucl)then
             if(index(trim(parkChar(1:20) ),'*').le.0)then
               read(parkChar(1:20),*)Sep_part
               exit
@@ -746,7 +749,7 @@ end subroutine define_minima
               stop
             endif
            endif
-                       
+
          elseif(inuc .eq. 1) then
            if(Atable.eq.Amass .and. Ztable.eq.Znucl)then
             if(index(trim(parkChar(20:40) ),'*').le.0)then
@@ -756,7 +759,7 @@ end subroutine define_minima
               stop
             endif
            endif
-           if(Atable.eq.Amass+1 .and. Ztable.eq.Znucl+1)then 
+           if(Atable.eq.Amass+1 .and. Ztable.eq.Znucl+1)then
             if(index(trim(parkChar(20:40) ),'*').le.0)then
               read(parkChar(20:40),*)Sep_part
               exit
@@ -765,15 +768,15 @@ end subroutine define_minima
               stop
             endif
            endif
-           
-         endif        
+
+         endif
        enddo
 
        Sep_hole = -Sep_hole/1000.d0; Sep_part = -Sep_part/1000.d0
        !write(*,*)Atable,Ztable,Sep_hole,Sep_part
 
       end subroutine read_mass
-      
+
 
 !*****************************************************************************************
 !*****************************************************************************************
@@ -781,7 +784,7 @@ end subroutine define_minima
                      Amass,Ipro,inuc,r0,rs0,An0,Vso,Vrn,            &
                         Lmin,Lmax,Ecut,Nmaxt,                   &
               PS,          NNST,JJP,LP,EP,VN)
-             !WaveFunction, N, J, L , E  , V, dim vectors1, dim vectors 2 
+             !WaveFunction, N, J, L , E  , V, dim vectors1, dim vectors 2
 
       IMPLICIT INTEGER (I-N)
       IMPLICIT REAL*8 (A-H,O-Z)
@@ -794,8 +797,8 @@ end subroutine define_minima
       REAL*8  :: DHMEN(NNP),D2HMEN(NNP),GI(NNP),GIprimo(NNP),MESMN(NNP)
       real*8  :: Pi
 
-      DIMENSION LPS(IMAXLEV) 
-      DIMENSION RHO(NNP),VC(NNP) 
+      DIMENSION LPS(IMAXLEV)
+      DIMENSION RHO(NNP),VC(NNP)
       DIMENSION PS(imaxlev,Nnp),EP(imaxlev)
       DIMENSION LP(imaxlev),JJP(imaxlev),EE(NMax),DV(NNP)
 
@@ -815,10 +818,10 @@ end subroutine define_minima
 
       N2max=Nmax
       Pi=2.*ASIN(1.)
-      
+
       if(inuc.eq.0)open(unit=9,file='Density_neutroni.dat')  ! file di scrittura
       if(inuc.eq.1)open(unit=9,file='Density_protoni.dat')
-      
+
 
 !-- Controllo su Nmax, basato sui numeri di nodi nel caso di buca qudrata,
 !-- Landau pg 88 "Meccanica Quantistica"
@@ -838,17 +841,17 @@ end subroutine define_minima
       RNs0=rs0*(AMass)**(1./3.)
 
       I_letto=0
-       do j=1,nmaxt  
-           R=h*j   
-           TEMP=(R-RN0)/AN0 
-           EX=EXP(-TEMP) 
-           VN(j)=VRN*EX/(1+EX)                            ! Wood Saxon 
+       do j=1,nmaxt
+           R=h*j
+           TEMP=(R-RN0)/AN0
+           EX=EXP(-TEMP)
+           VN(j)=VRN*EX/(1+EX)                            ! Wood Saxon
 
-           TEMP=(R-RNS0)/AN0 
-           EX=EXP(-TEMP) 
-           VSON(j)=VSO*Rs0**2*EX/(1+EX)/(R*AN0*(1.+EX)) 
+           TEMP=(R-RNS0)/AN0
+           EX=EXP(-TEMP)
+           VSON(j)=VSO*Rs0**2*EX/(1+EX)/(R*AN0*(1.+EX))
 !
-!           write(100,*)VSON(j),VSO,RNS0,EX/(1+EX)/(R*AN0*(1.+EX)) 
+!           write(100,*)VSON(j),VSO,RNS0,EX/(1+EX)/(R*AN0*(1.+EX))
 !C    calcola il potenziale di una sfera omogenea carica di raggio
           if(inuc.eq.1) then
           if((R-RN0).le.0) then
@@ -857,17 +860,17 @@ end subroutine define_minima
              VC(j)=1.4399*(IPRO-1)/R
           endif
 
-            VN(j)=VN(j)+VC(j) 
+            VN(j)=VN(j)+VC(j)
           endif
 
-           DV(j)= -VRDER*EX/(1+EX)/(1+EX)/AN0     !potenziale per la induced 
+           DV(j)= -VRDER*EX/(1+EX)/(1+EX)/AN0     !potenziale per la induced
            HMEN(J)=20.75d0
            DHMEN(J)=0.d0
            D2HMEN(J)=0.d0
         RHO(j)=0.d0
         write(100,*)R,VN(j),VRN
        end do
-       
+
        nh=1
       write(51,*)'Scrivo i livelli di particella singola'
       write(51,*)'protoni-> isospin 1 o neutroni -> isospin 0'
@@ -876,25 +879,25 @@ end subroutine define_minima
       write(51,*)
 
        do L=Lmin,Lmax
-        
+
          do S=1,0,-1
            if(s.eq.1)ij=1
            if(s.eq.0)ij=2
-          
+
            J=2*L+2*S-1
            if(L.eq.0.and.S.eq.0)GO TO 300
-        
-           do N=1,Nmax,1        
-               
+
+           do N=1,Nmax,1
+
                do kx=1,nmaxt
                  GI(kx)=DHMEN(kx)/HMEN(kx)
                  GIprimo(kx)=HMEN(kx)*D2HMEN(kx)-(DHMEN(kx))**2
-                 GIprimo(kx)= GIprimo(kx)/(HMEN(kx))**2                
+                 GIprimo(kx)= GIprimo(kx)/(HMEN(kx))**2
                end do
 
                CALL NUMEROV(h,Nmaxt,Emax0,N,L,J,E,U,VN,VSON, &
                             HMEN,MESMN,GI,GIprimo,DHMEN,D2HMEN,no)
-            
+
              if(no.ne.-1.and.e.lt.ecut)then
                EE(n)=e
                if(n.gt.1)then
@@ -911,8 +914,8 @@ end subroutine define_minima
              EP(Nh)=E
              JJP(Nh)=j !2*l-2*s+1
              LPS(NH)=2*l+IJ-2
-             IF(L.EQ.0)LPS(NH)=0 
-             do ii=1,nmaxt 
+             IF(L.EQ.0)LPS(NH)=0
+             do ii=1,nmaxt
               PS(NH,ii)=U(ii)
              enddo
              nh=nh+1
@@ -921,7 +924,7 @@ end subroutine define_minima
              go to 300
              endif
 
-           end do !N           
+           end do !N
 
 300      CONTINUE
          end do
@@ -930,18 +933,18 @@ end subroutine define_minima
 
        NNST=NH-1
 
-       IF(NNST.GT.IMAXLEV) THEN 
-          WRITE(6,*) 'IMAXLEV IS TOO SMALL: THE SUBROUTINE Boundary' 
-       STOP 
-       END IF 
-       if(inuc.eq.0)write(*,*)' N. OF ACTIVE NEUTRON LEVELS = ', NNST 
-       if(inuc.eq.0)write(51,*)' N. OF ACTIVE NEUTRON LEVELS = ', NNST 
-       if(inuc.eq.1)write(*,*)' N. OF ACTIVE PROTON LEVELS = ', NNST 
-       if(inuc.eq.1)write(51,*)' N. OF ACTIVE PROTON LEVELS = ', NNST 
+       IF(NNST.GT.IMAXLEV) THEN
+          WRITE(6,*) 'IMAXLEV IS TOO SMALL: THE SUBROUTINE Boundary'
+       STOP
+       END IF
+       if(inuc.eq.0)write(*,*)' N. OF ACTIVE NEUTRON LEVELS = ', NNST
+       if(inuc.eq.0)write(51,*)' N. OF ACTIVE NEUTRON LEVELS = ', NNST
+       if(inuc.eq.1)write(*,*)' N. OF ACTIVE PROTON LEVELS = ', NNST
+       if(inuc.eq.1)write(51,*)' N. OF ACTIVE PROTON LEVELS = ', NNST
 
 !      do i=1,nnst
 !       if(inuc.eq.1) then
-!         do ii=1,nmaxt   
+!         do ii=1,nmaxt
 !           VN(ii)=VN(ii)-VC(ii) ! eventually removes coulomb
 !         enddo
 !       endif
@@ -961,12 +964,12 @@ end subroutine define_minima
 
        IMPLICIT INTEGER (I-N)
        IMPLICIT REAL*8 (A-H,O-Z)
-       REAL*8 MA,MESMP(Nmaxt),MESMN(Nmaxt),POT 
+       REAL*8 MA,MESMP(Nmaxt),MESMN(Nmaxt),POT
        DIMENSION U(Nmaxt),V(Nmaxt),HMEN(Nmaxt),HME(Nmaxt),         &
        HMEP(Nmaxt),VN(Nmaxt),VP(Nmaxt),VSON(Nmaxt),VSOP(Nmaxt),    &
        VSO(Nmaxt),VC(Nmaxt),VCOUL(Nmaxt)
        REAL*8 GI(Nmaxt),GIprimo(Nmaxt),EFFE,KAPPAQ(Nmaxt),W(Nmaxt),WAUX(Nmaxt)
-       REAL*8 DHMEN(Nmaxt),D2HMEN(Nmaxt)     
+       REAL*8 DHMEN(Nmaxt),D2HMEN(Nmaxt)
        REAL*8 DE
        INTEGER kstar,flagstar
        REAL*8 Fstar,Fstarprec
@@ -998,16 +1001,16 @@ end subroutine define_minima
        !---- defining the accuracy for the energy (in MeV) ----
        DE=0.5E-12
        niter=500
-       NODE=N-1  !this is the search number of nodes         
+       NODE=N-1  !this is the search number of nodes
        EMAX=EMAX0!ecut+emax0
 
        WLIM=1E-07
 
        istamp=0
-       
 
 
-       iprogress=1  !this index indicates the progress of the calculation 
+
+       iprogress=1  !this index indicates the progress of the calculation
 
        do i=1,nmaxt
 !         if(nt.eq.1) then
@@ -1027,8 +1030,8 @@ end subroutine define_minima
        if(L.eq.0)ESO=0.d0
 
   56   CONTINUE
-  
-       
+
+
        !---- setting Emin equal to the minimum of the potential ----
        POTmin=0.d0
        do i=1,nmaxt
@@ -1039,7 +1042,7 @@ end subroutine define_minima
        EMIN=POTmin
 
  59    CONTINUE
-       
+
        DO KT=1,NITER
 
          ETRIAL = (EMIN+EMAX)/2.0
@@ -1052,7 +1055,7 @@ end subroutine define_minima
          W(1)=1.E-10
          ND=0
          IOUT=0
-          
+
          !---- determining the point (kstar) before which the wave function
          !     cannot have an oscillating behaviour.
          flagstar=0
@@ -1063,7 +1066,7 @@ end subroutine define_minima
 !           if(L.gt.10)then
              if(flagstar.eq.0.and.Fstar.eq.0.d0)then
                kstar=i
-               flagstar=1             
+               flagstar=1
              elseif(i.ge.2)then
                if(flagstar.eq.0.and.Fstarprec*Fstar.lt.0.d0)then
                  kstar=i
@@ -1082,14 +1085,14 @@ end subroutine define_minima
          if(istamp.eq.1)write(*,304)iprogress
  302     FORMAT('     (kstar= ',I5,')')
  304     FORMAT('   (iprogress= ',I5,')')
-         !---- propagation of the solution till U(nmaxt)       
+         !---- propagation of the solution till U(nmaxt)
          DO I = 1,NMAXT-1!NMXT-2
          R=H*I
 
            !---- to compute W(2) it uses W(1) and W(0)=0.0
            if(i.eq.1)then
              W(i+1)=W(i)*2.d0*(1.d0-(5.d0*H**2.d0/12.d0)*KAPPAQ(i))
-             W(i+1)=W(i+1)/(1.d0+(H**2.d0/12.d0)*KAPPAQ(i+1)) 
+             W(i+1)=W(i+1)/(1.d0+(H**2.d0/12.d0)*KAPPAQ(i+1))
            else
              W(i+1)=W(i)*2.d0*(1.d0-(5.d0*H**2.d0/12.d0)*KAPPAQ(i))-   &
                   W(i-1)*(1.d0+(H**2.d0/12.d0)*KAPPAQ(i-1))
@@ -1105,16 +1108,16 @@ end subroutine define_minima
                ND=ND+1
              end if
            end if  !it needs to divide ND by 2 (made later)
-           
 
-         END DO       
+
+         END DO
 
   46     CONTINUE
          ND=ND/2
 
          if(istamp.eq.1)write(*,305)ND
          if(istamp.eq.1)write(*,308)W(nmaxt)
- 305     FORMAT('   (nodes= ',I5,')')     
+ 305     FORMAT('   (nodes= ',I5,')')
  308     FORMAT('   (W(nmaxt)= ',E14.6,')')
 
          !if(EMAX-EMIN.lt.DE) GO TO 61
@@ -1127,7 +1130,7 @@ end subroutine define_minima
          !                  N   for iprogress=2
          if(iprogress.eq.1)then
            if(ND.eq.NODE)then
-             GO TO 61    
+             GO TO 61
            elseif(ND.lt.NODE)then
              EMIN=ETRIAL
            elseif(ND.gt.NODE)then
@@ -1135,7 +1138,7 @@ end subroutine define_minima
            end if
          elseif(iprogress.eq.2)then
            if(ND.eq.NODE+1)then
-             GO TO 61    
+             GO TO 61
            elseif(ND.lt.NODE+1)then
              EMIN=ETRIAL
            elseif(ND.gt.NODE+1)then
@@ -1147,7 +1150,7 @@ end subroutine define_minima
            if(w(kstar).eq.0.d0)then
              write(*,*)'ERROR for N,L,J=',N,L,J
              write(*,*)'w(kstar)=0.0'
-             NO=-1 
+             NO=-1
              GO TO 100
            end if
            ND3=ND
@@ -1158,8 +1161,8 @@ end subroutine define_minima
              WE1=WE3
              E1=E3
              GO TO 36  !when iprogress=3 the shooting method decisions are taken
-                       !outside the cycle on KT. 
-             
+                       !outside the cycle on KT.
+
            elseif(WE1*WE3.lt.0.d0)then !solution 3 has W(nmaxt) of the same sign as for
                                        !solution 2. That is, their energies are both LOWER
                                        !than the eigenstate.
@@ -1185,7 +1188,7 @@ end subroutine define_minima
          end if
 
 
-  60     CONTINUE          
+  60     CONTINUE
        end do  !KT
 
   61   CONTINUE
@@ -1196,7 +1199,7 @@ end subroutine define_minima
                               ![EMIN,EMAX]
 !         write(*,*)'Error for N,L,J=',N,L,J
 !         write(*,*)'SOLUTION NOT FOUND AT iprogress=',iprogress
-         NO=-1 
+         NO=-1
          GO TO 100
        end if
 
@@ -1206,7 +1209,7 @@ end subroutine define_minima
          if(w(kstar).eq.0.d0)then
            write(*,*)'ERROR for N,L,J=',N,L,J
            write(*,*)'w(kstar)=0.0'
-           NO=-1 
+           NO=-1
            GO TO 100
          end if
          E1=ETRIAL
@@ -1223,7 +1226,7 @@ end subroutine define_minima
         if(w(kstar).eq.0.d0)then
            write(*,*)'ERROR for N,L,J=',N,L,J
            write(*,*)'w(kstar)=0.0'
-           NO=-1 
+           NO=-1
            GO TO 100
          end if
          E2=ETRIAL
@@ -1240,7 +1243,7 @@ end subroutine define_minima
  36    if(ND2-ND1.gt.1.or.ND2-ND1.lt.1)then
 !         write(*,*)'Error for N,L,J=',N,L,J
 !         write(*,*)'ND2-ND1=',ND2-ND1
-         NO=-1 
+         NO=-1
          GO TO 100
        end if
 
@@ -1254,26 +1257,26 @@ end subroutine define_minima
        if(WE1*WE2.gt.0.d0)then
 !         write(*,*)'Error for N,L,J=',N,L,J
 !         write(*,*)'WE1*WE2<0'
-         NO=-1 
-         GO TO 100         
+         NO=-1
+         GO TO 100
        elseif(WE1*WE2.eq.0.d0.and.WE1.eq.0.d0)then
 !         write(*,*)'Error for N,L,J=',N,L,J
 !         write(*,*)'WE1=0'
-         NO=-1 
+         NO=-1
          GO TO 100
        elseif(WE1*WE2.eq.0.d0.and.WE1.ne.0.d0)then  !solution found in iprogress=2
                                                     !is the right solution
-         EFINAL=E2 
+         EFINAL=E2
          NDfinal=ND2
          GO TO 101
        elseif(WE1*WE2.lt.0.d0)then  !we have to keep on playing the shooting method game
-                                    !until the requested accuracy on the energy is required.         
+                                    !until the requested accuracy on the energy is required.
          if(EMAX-EMIN.le.DE)then
-           EFINAL=E2                                 
+           EFINAL=E2
            NDfinal=ND2
            GO TO 101
-         else 
-           EMIN=E1                  !the solution is in between solution 1 (with ND=N) 
+         else
+           EMIN=E1                  !the solution is in between solution 1 (with ND=N)
            EMAX=E2                  !and solution 2 (with ND=N+1)
            GO TO 59  !let's propagate the solution in the same way used for first and second phases.
                      !A difference occurs: the shooting method is driven by the sign of the
@@ -1310,12 +1313,12 @@ end subroutine define_minima
        !                         to shift the last node to the edge of the box.
        if(EFINAL.lt.0.d0)then
 
-         !searching for the position (=imax) of the first maximum/minimum 
+         !searching for the position (=imax) of the first maximum/minimum
          !and computing the average point (=KL) between this max/min and
          !the last node (=ii). This point (=KL) is found in the tail of
          !last oscillation of the wave function, before of the (expected)
          !exponentially decaying behaviour.
-         do imax=ii,kstar,-1   
+         do imax=ii,kstar,-1
            if(dabs(W(imax-1))-dabs(W(imax)).le.0.d0)then
              KL=(imax+ii)/2
              GO TO 71
@@ -1351,7 +1354,7 @@ end subroutine define_minima
        !---- computing U(i)=W(i)/sqrt(HMEN(i))
        do i=1,nmaxt
          U(i)=W(i)/(dsqrt(HMEN(i)))
-       end do                   
+       end do
 
        !---- normalization of the radial wave function
        !     (employing the extended Simpson's rule (eq.4.1.13 Fortran Numerical Recipes))
@@ -1400,4 +1403,4 @@ end subroutine define_minima
  100   NO=-1
        RETURN
 
-       END   
+       END
