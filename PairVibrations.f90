@@ -83,7 +83,7 @@
         Zeta=1.d0
         Nlivelli=0
         do i=1,mphon
-         read(01,*,end=101)llk(i),jjk(i),e_sp(i),V(i),Zeta(i)
+         read(01,*,end=101)llk(i),jjk(i),e_sp(i),V(i)!,Zeta(i)
 
           if(V(i).gt.0.5)then
              iGapDn=i;iGapUp=i+1
@@ -397,16 +397,17 @@
          stop
        endif
 
-
        call disp_relation
 
+!      write(*,*)EcutFunction,dW
        Wintegrale=-EcutFunction+dW
        do i=-ir_tot+2,ir_tot-2
+!         write(*,*)i,DispersionFunction(i)
           if(DispersionFunction(i).lt.DispersionFunction(i-1))then
              if(DispersionFunction(i).lt.DispersionFunction(i+1))then
                 if(abs(DispersionFunction(i-1)-DispersionFunction(i+1)).lt.10*dW)then
                    Wminimo=Wintegrale
-                   write(*,*)'Wminimo Trovato!!',Wminimo
+                   write(*,*)'Wminimo Trovato!!',i,Wminimo
                 endif
              endif
           endif
@@ -418,6 +419,7 @@
        flag_efn = .true.
 
        write(*,*)'Calculating with adjusted Fermi Energy'
+!       stop
 
        call disp_relation
 
@@ -650,9 +652,9 @@ end subroutine define_minima
          if(e_sp(i).gt.EcutFunction)exit
 !         write(*,*)llk(i),jjk(i),e_sp(i),Pnum
         enddo
-        NLivelli = i
+        NLivelli = i-1
 
-     end subroutine
+     end subroutine make_levels
 
 !--------------------------------------------------------------------!
 
