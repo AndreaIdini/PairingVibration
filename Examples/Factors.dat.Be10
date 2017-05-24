@@ -1,0 +1,14 @@
+ ---- Fermi Energy=  -4.0069999999990555       ----
+ Energy of Pair Addition and Removal phonons
+ W(a=+2)=   4.3487699999981118      W(a=-2)=  0.51000000000188983     
+ Pairing strength of Pair Addition and Removal phonons
+ G(a=+2)=  0.71924041671731265      G(a=-2)=   1.0514775646994357     
+
+     E                L    2J      Z           X         Y
+-19.5500 15.5430      0    1    1.0000      0.2265      0.0525
+ -6.8120  2.8050      1    3    1.0000      1.9201      0.2641
+ -0.5020  3.5050      0    1    1.0000      0.6988      0.9208
+ -0.1800  3.8270      1    1    1.0000      0.5626      0.8481
+  1.2800  5.2870      2    5    1.0000      0.5174      1.0820
+
+# To be compared with (Physics of Atomic Nuclei 77 (8), 941, https://arxiv.org/pdf/1212.2437.pdf, Appendix A, especially Fig. 23 and Table V).
