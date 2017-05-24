@@ -419,6 +419,10 @@
        flag_efn = .true.
 
        write(*,*)'Calculating with adjusted Fermi Energy'
+       do i=1,NLivelli
+        ek(i)=abs(e_sp(i)-efn)
+       enddo
+       
 !       stop
 
        call disp_relation
