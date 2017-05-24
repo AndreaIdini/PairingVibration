@@ -18,16 +18,16 @@
      &                 emin_rem, xadd, xrem, yadd, yrem, Wminimo
 
 
-       integer      ::  llk, jjk,Nlivelli,ichoose,nfon,lambda2,       &
+       integer      ::  llk, jjk,Nlivelli,ichoose,lambda2,       &
      &                  ilph,n,frag,jjk1,llk1,frag1,              &
      &                  igapUp,igapDn, ir_tot
 
        dimension    ::  ek(mphon),e_sp(mphon),llk(mphon),jjk(mphon),w(lmax,mphon),     &
      &                  betal(lmax,mphon),BE_Lambda(lmax,mphon),           &
-     &                  nfon(lmax),frag(mphon),zeta(mphon),V(mphon),       &
+     &                  frag(mphon),zeta(mphon),V(mphon),       &
      &                  add(mphon),Rem(mphon),                             &
      &                  DispAdd(NRmax),DispRem(NRmax),                     &
-     &                  Xadd(lmax),Yadd(lmax),Xrem(lmax),Yrem(lmax)
+     &                  Xadd(mphon),Yadd(mphon),Xrem(mphon),Yrem(mphon)
 
        real(kind=8), dimension(:), allocatable :: DispersionFunction
 
@@ -297,14 +297,15 @@
             Yrem(i)= jfac/(2*ek(i)+abs(Epho))
           endif
         else
-         if(V(i).gt.0.1)then
-         Xadd(i)=0.
-         Yadd(i)= jfac/(2*ek(i)+Epho)
-        else
-         Yadd(i)=0.
-         Xadd(i)= jfac/(2*ek(i)-Epho)
+          if(V(i).gt.0.1)then
+            Xadd(i)=0.
+            Yadd(i)= jfac/(2*ek(i)+Epho)
+          else
+            Yadd(i)=0.
+            Xadd(i)= jfac/(2*ek(i)-Epho)
+          endif
         endif
-        endif
+
        enddo
 
          SumAdd=0.
@@ -337,6 +338,7 @@
         crem= 1./sqrt(abs(SumRem))
 
        do i=1,Nlivelli
+
         Xadd(i)=Xadd(i)*cadd
         Yadd(i)=Yadd(i)*cadd
         Xrem(i)=Xrem(i)*crem
@@ -344,9 +346,27 @@
 
         if(Epho.lt.0.)then
           write(12,105)e_sp(i),ek(i),llk(i),jjk(i),Zeta(i),Xrem(i),Yrem(i)
+
+          if( ISNAN(Xrem(i)) .or. ISNAN(Yrem(i)))then
+            write(*,*)'Singularity in Removal Phonon', i,Epho
+            write(*,*)ek(i),jfac,Zeta(i),Xrem(i),Yrem(i)
+            write(*,*)crem
+            stop
+          endif
+
         else
+
           write(12,105)e_sp(i),ek(i),llk(i),jjk(i),Zeta(i),Xadd(i),Yadd(i)
+
+          if( ISNAN(Xadd(i)) .or. ISNAN(Yadd(i)))then
+            write(*,*)'Singularity in Addition phonon', i,Epho
+            write(*,*)ek(i),jfac,Zeta(i),Xadd(i),Yadd(i)
+            write(*,*)cadd
+            stop
+          endif
+
         endif
+
        enddo
 
  105      format(2(f8.4),2x,2(i5),6(f10.4,2x))
@@ -422,7 +442,7 @@
        do i=1,NLivelli
         ek(i)=abs(e_sp(i)-efn)
        enddo
-       
+
 !       stop
 
        call disp_relation
