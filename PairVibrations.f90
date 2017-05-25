@@ -254,7 +254,7 @@
        write(*,*)
        write(*,*)'Coefficienti X_n e Y_n'
 
-       write(11,*)'    E                L    2J      Z           X         Y'
+       write(11,*)'  E_sp  |E_sp-E_F|    L    2J      Z        Xrem        Yadd'
        do i=1,Nlivelli
         Xadd(i)=Xadd(i)*cadd
         Yadd(i)=Yadd(i)*cadd
@@ -268,6 +268,8 @@
         else
           write(*,*)'==================',i,'     ================='
           write(*,*)'X_add = ',Xadd(i),' Y_rem = ',Yrem(i)
+          if(i.eq.iGapUp)write(11,*)'  E_sp  |E_sp-E_F|    L    2J      Z        Xadd        Yrem'
+
           write(11,105)e_sp(i),ek(i),llk(i),jjk(i),Zeta(i),XAdd(i),YRem(i)
         endif
        enddo
@@ -408,6 +410,13 @@
        write(*,*)'New = 2, Livelli Sperimentali = 1, Livelli Self Energy = 0'
        read(*,*) icalc
 
+       if(inuc.eq.0)write(11,*)'Neutron Pairing Vibration for nucleus with A=',int(Amass),'Z=',Znucl
+       if(inuc.eq.1)write(11,*)'Proton  Pairing Vibration for nucleus with A=',int(Amass),'Z=',Znucl
+       if(icalc.eq.0)write(11,*)'Calculation from NFT Dyson Equation Results'
+       if(icalc.eq.1)write(11,*)'Calculation from personalized list of levels'
+       if(icalc.eq.2)write(11,*)'Calculation from Bohr and Mottelson Wood Saxon'
+       write(11,*)'- Correlation Energy of Addition and Removal =', DiffAddition, DiffRemoval
+
        if(icalc.le.1)then
          call read_define(icalc,flag_efn)
        elseif(icalc.eq.2)then
@@ -509,7 +518,7 @@
           abs(abs(DispersionFunction(i-1)-1.d0/Grem) - abs(DispersionFunction(i+1)- 1.d0/Grem)).lt.10.*dW                        &
               )then
                write(12,*)'Ephonon-Rem',Abs(Wintegrale)
-               write(12,*)'    E                L    2J      Z           X         Y'
+               write(12,*)'  E_sp  |E_sp-E_F|    L    2J      Z        Xrem         Yrem'
                call XY(Wintegrale)
             endif
          else             !E>0
@@ -518,7 +527,7 @@
            abs(abs(DispersionFunction(i-1)-1.d0/Gadd) - abs(DispersionFunction(i+1)- 1.d0/Gadd)).lt.10.*dW                        &
               )then
                write(12,*)'Ephonon-Add',Abs(Wintegrale)
-               write(12,*)'    E                L    2J      Z           X         Y'
+               write(12,*)'  E_sp  |E_sp-E_F|    L    2J      Z        Xadd         Yadd'
                call XY(Wintegrale)
             endif
          endif
@@ -552,6 +561,7 @@
        write(*,*)'Pairing strength of Pair Addition and Removal phonons'
        write(*,*)'G(a=+2)=',GAdd,'G(a=-2)=',GRem
 
+       write(11,*)
        write(11,*)'---- Fermi Energy=', efn,' ----'
        write(11,*)'Energy of Pair Addition and Removal phonons'
        write(11,*)'W(a=+2)=',PairAddition,'W(a=-2)=',PairRemoval
