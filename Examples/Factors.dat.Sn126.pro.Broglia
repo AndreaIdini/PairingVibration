@@ -1,0 +1,23 @@
+ Proton  Pairing Vibration for nucleus with A=         126 Z=          50
+ Calculation from personalized list of levels
+ - Correlation Energy of Addition and Removal =   1.6098740000002181        1.7632380000000012     
+
+ ---- Fermi Energy=   2.0250000000009454       ----
+ Energy of Pair Addition and Removal phonons
+ W(a=+2)=   2.8201259999978916      W(a=-2)=   2.2867620000018896     
+ Pairing strength of Pair Addition and Removal phonons
+ G(a=+2)=  0.16170045926521517      G(a=-2)=  0.17548693094399864     
+
+   E_sp  |E_sp-E_F|    L    2J      Z        Xrem        Yadd
+ -6.7400  8.7650      3    7    1.0000      0.1058      0.0725
+ -3.8900  5.9150      3    5    1.0000      0.1463      0.0872
+ -3.0700  5.0950      1    3    1.0000      0.1442      0.0802
+ -1.5700  3.5950      1    1    1.0000      0.1644      0.0737
+  0.0000  2.0250      4    9    1.0000      1.0222      0.2400
+   E_sp  |E_sp-E_F|    L    2J      Z        Xadd        Yrem
+  4.2400  2.2150      4    7    1.0000      0.9161      0.2400
+  5.0600  3.0350      2    5    1.0000      0.3930      0.1671
+  7.1000  5.0750      5   11    1.0000      0.2464      0.1588
+  7.5300  5.5050      0    1    1.0000      0.0900      0.0606
+  7.7600  5.7350      2    3    1.0000      0.1206      0.0829
+ 14.9300 12.9050      5    9    1.0000      0.0717      0.0642
