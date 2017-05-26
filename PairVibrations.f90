@@ -396,7 +396,7 @@
        open(unit=15,file='Input_WS.in',status='old')
        open(unit=20,file='mass.mas12', status='old',action = 'read')
        open(unit=21,file='rct2.mas12', status='old',action = 'read')
-       open(unit=51,file='outlevels.dat')
+       open(unit=52,file='outlevels.dat')
 
 
        read(15,*)Amass,Znucl,    inuc
@@ -615,11 +615,6 @@ end subroutine define_minima
 
        endif
 
-             !WaveFunction, N, J, L , E  , V, dim vectors1, dim vectors 2
-       do i=1,50
-          write(51,*)e_sp(i),float(llk(i)),float(jjk(i))
-       enddo
-
        !Sorting Secondo Energia
          do i=1,NLivelli-1
            do j=i+1,NLivelli
@@ -687,6 +682,16 @@ end subroutine define_minima
 !         write(*,*)llk(i),jjk(i),e_sp(i),Pnum
         enddo
         NLivelli = i-1
+        !WaveFunction, N, J, L , E  , V, dim vectors1, dim vectors 2
+
+        write(52,*)'#- Diff Addition, Diff Removal -#'
+        write(52,*)DiffAddition,DiffRemoval
+        write(52,*)'#- L 2J ek V Z-#'
+
+        do i=1,NLivelli
+          if(i.lt.iGapUp)write(52,*)llk(i),jjk(i),e_sp(i),1
+          if(i.ge.iGapUp)write(52,*)llk(i),jjk(i),e_sp(i),0
+        enddo
 
      end subroutine make_levels
 
