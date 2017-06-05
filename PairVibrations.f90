@@ -408,7 +408,7 @@
        write(*,*)'------------- Pairing Gap ------------------ =',PairingGap
 
        write(*,*)'New = 2, Livelli Sperimentali = 1, Livelli Self Energy = 0'
-       read(*,*) icalc
+       read(*,*) icalc; write(*,*) icalc
 
        if(inuc.eq.0)write(11,*)'Neutron Pairing Vibration for nucleus with A=',int(Amass),'Z=',Znucl
        if(inuc.eq.1)write(11,*)'Proton  Pairing Vibration for nucleus with A=',int(Amass),'Z=',Znucl
@@ -515,7 +515,7 @@
          if(i.lt.0)then   !E<0
            if(abs(DispersionFunction(i)- 1.d0/Grem).lt.abs(DispersionFunction(i-1)- 1.d0/Grem).and. &
               abs(DispersionFunction(i)- 1.d0/Grem).lt.abs(DispersionFunction(i+1)- 1.d0/Grem).and. &
-          abs(abs(DispersionFunction(i-1)-1.d0/Grem) - abs(DispersionFunction(i+1)- 1.d0/Grem)).lt.10.*dW                        &
+          abs(abs(DispersionFunction(i-1)-1.d0/Grem) - abs(DispersionFunction(i+1)- 1.d0/Grem)).lt.100.*dW                        &
               )then
                write(12,*)'Ephonon-Rem',Abs(Wintegrale)
                write(12,*)'  E_sp  |E_sp-E_F|    L    2J      Z        Xrem         Yrem'
@@ -524,7 +524,7 @@
          else             !E>0
             if(abs(DispersionFunction(i)- 1.d0/Gadd).lt.abs(DispersionFunction(i-1)- 1.d0/Gadd).and. &
                abs(DispersionFunction(i)- 1.d0/Gadd).lt.abs(DispersionFunction(i+1)- 1.d0/Gadd).and. &
-           abs(abs(DispersionFunction(i-1)-1.d0/Gadd) - abs(DispersionFunction(i+1)- 1.d0/Gadd)).lt.10.*dW                        &
+           abs(abs(DispersionFunction(i-1)-1.d0/Gadd) - abs(DispersionFunction(i+1)- 1.d0/Gadd)).lt.100.*dW                        &
               )then
                write(12,*)'Ephonon-Add',Abs(Wintegrale)
                write(12,*)'  E_sp  |E_sp-E_F|    L    2J      Z        Xadd         Yadd'
