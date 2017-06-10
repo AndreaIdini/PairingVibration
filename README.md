@@ -10,9 +10,10 @@ Andrea Idini, Univ. of Surrey
 Use Makefile to compile.
 Change nucleus and proton/neutron vibration in Input\_WS.in. 
 
-If you use the option 2, the program will scan the Atomic Mass Evaluation 2012 for masses and fix nuclear levels with a standard Bohr and Mottelson Wood Saxon, enjoy the rest.
+If you use the option 2, the program will scan the Atomic Mass Evaluation 2012 for masses, automatically selecting pairing correlation energy. Consequently, it fixes nuclear particle-hole gap. 
+It calculates levels using the standard parametrization of Bohr and Mottelson for Wood Saxon + Coulomb, enjoy the simplicity.
 
-If you use the option 1, you can specify levels and other inputs following the format in the example.
+If you use the option 1, you can specify levels and correlation energies following the format in the example.
 
 
 ## Output:
