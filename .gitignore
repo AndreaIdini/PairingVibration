@@ -4,6 +4,7 @@ Pb208/
 C14/
 Sn100/
 Sn132/
+Extra-Outputs/
 
 # Inputs
 
@@ -35,3 +36,4 @@ RPA/
 *.pdf
 *.gnumeric
 *.dat
+*.check
