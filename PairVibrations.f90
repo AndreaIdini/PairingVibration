@@ -375,6 +375,27 @@
 
        end subroutine XY
 
+       logical function graph_solve(fun_arr)
+         real(kind=8), dimension(:), allocatable, intent(in) :: fun_arr
+         integer                  :: N,i
+
+         graph_solve =.FALSE.
+
+         if(allocated(fun_arr))then
+
+! lbound(fun_arr,1),ubound(fun_arr,1)
+!!! INSERT HERE SOLVING ALGORITHM !!!
+
+          !  do i=lbound(fun_arr,1),ubound(fun_arr,1)
+          !    write(*,*)i,fun_arr(i)
+          !  enddo
+           graph_solve =.TRUE.
+
+         else
+           stop 'error in allocation of functional array in graph_solve'
+         endif
+       end function graph_solve
+
        end module Stuff
 
 !------------------- MAIN -------------------!
@@ -385,7 +406,7 @@
        integer             :: i, icalc, Znucl,inuc
        real (kind=8)       :: Sep_hole,Sep_part,Amass, PairingGap
        logical             :: flag_efn = .false.
-
+       logical             :: bool
 
        ir_tot = ceiling(EcutFunction/dW)
        allocate (DispersionFunction(-ir_tot:ir_tot))
@@ -451,7 +472,6 @@
        do i=1,NLivelli
         ek(i)=abs(e_sp(i)-efn)
        enddo
-
 !       stop
 
        call disp_relation
@@ -460,7 +480,11 @@
 
        call XY1_Calculation
 
+       bool = graph_solve(DispersionFunction)
+
        END
+
+
 
 !!! Pb208 !!!
 !        DiffAddition=1.237
@@ -512,6 +536,7 @@
 
        Wintegrale=-EcutFunction+dW
        do i=-ir_tot+2,ir_tot-2
+
          if(i.lt.0)then   !E<0
            if(abs(DispersionFunction(i)- 1.d0/Grem).lt.abs(DispersionFunction(i-1)- 1.d0/Grem).and. &
               abs(DispersionFunction(i)- 1.d0/Grem).lt.abs(DispersionFunction(i+1)- 1.d0/Grem).and. &
