@@ -385,6 +385,11 @@
 
 ! lbound(fun_arr,1),ubound(fun_arr,1)
 !!! INSERT HERE SOLVING ALGORITHM !!!
+! abs(DispersionFunction(i)- 1.d0/Grem).lt.abs(DispersionFunction(i-1)- 1.d0/Grem).and. &
+!    abs(DispersionFunction(i)- 1.d0/Grem).lt.abs(DispersionFunction(i+1)- 1.d0/Grem).and. &
+! abs(abs(DispersionFunction(i-1)-1.d0/Grem) &
+! - abs(DispersionFunction(i+1)- 1.d0/Grem)).lt.1000.*dW
+
 
           !  do i=lbound(fun_arr,1),ubound(fun_arr,1)
           !    write(*,*)i,fun_arr(i)
