@@ -375,27 +375,25 @@
 
        end subroutine XY
 
-       logical function graph_solve(fun_arr)
+       logical function graph_solve(fun_arr,idx,cons)
          real(kind=8), dimension(:), allocatable, intent(in) :: fun_arr
+         real(kind=8)                           , intent(in) :: cons
+         integer                                , intent(in) :: idx
          integer                  :: N,i
 
-         graph_solve =.FALSE.
-
          if(allocated(fun_arr))then
-
+           graph_solve =.FALSE.
 ! lbound(fun_arr,1),ubound(fun_arr,1)
 !!! INSERT HERE SOLVING ALGORITHM !!!
-! abs(DispersionFunction(i)- 1.d0/Grem).lt.abs(DispersionFunction(i-1)- 1.d0/Grem).and. &
-!    abs(DispersionFunction(i)- 1.d0/Grem).lt.abs(DispersionFunction(i+1)- 1.d0/Grem).and. &
-! abs(abs(DispersionFunction(i-1)-1.d0/Grem) &
-! - abs(DispersionFunction(i+1)- 1.d0/Grem)).lt.1000.*dW
-
-
-          !  do i=lbound(fun_arr,1),ubound(fun_arr,1)
-          !    write(*,*)i,fun_arr(i)
-          !  enddo
-           graph_solve =.TRUE.
-
+           if(abs(fun_arr(idx)- cons).lt.abs(fun_arr(idx-1)- cons).and. &
+              abs(fun_arr(idx)- cons).lt.abs(fun_arr(idx+1)- cons))then !If it crosses "Const"
+                                                                        !Check for monothonicity to verify is not a pole
+              if(idx.lt.0)then  !This function is defined as monothonically decreasing for x (and i) < 0 and increasing for > 0
+                if(fun_arr(idx+1).lt.fun_arr(idx).and.fun_arr(idx).lt.fun_arr(idx-1))graph_solve =.TRUE.
+              else
+                if(fun_arr(idx+1).gt.fun_arr(idx).and.fun_arr(idx).gt.fun_arr(idx-1))graph_solve =.TRUE.
+              endif
+            endif
          else
            stop 'error in allocation of functional array in graph_solve'
          endif
@@ -485,8 +483,6 @@
 
        call XY1_Calculation
 
-       bool = graph_solve(DispersionFunction)
-
        END
 
 
@@ -533,7 +529,7 @@
      use Stuff
      implicit none
 
-     integer :: i
+     integer :: i, NphonRem = 0, NphonAdd = 0, LevPart = 0, LevHole =0
 
        write(12,*)'Pairing strength of Pair Addition and Removal phonons'
        write(12,*)'G(a=+2)=',GAdd,'G(a=-2)=',GRem
@@ -543,19 +539,15 @@
        do i=-ir_tot+2,ir_tot-2
 
          if(i.lt.0)then   !E<0
-           if(abs(DispersionFunction(i)- 1.d0/Grem).lt.abs(DispersionFunction(i-1)- 1.d0/Grem).and. &
-              abs(DispersionFunction(i)- 1.d0/Grem).lt.abs(DispersionFunction(i+1)- 1.d0/Grem).and. &
-          abs(abs(DispersionFunction(i-1)-1.d0/Grem) &
-          - abs(DispersionFunction(i+1)- 1.d0/Grem)).lt.1000.*dW  )then
+           if( graph_solve(DispersionFunction,i,1.d0/Grem) )then
+               Nphonrem = Nphonrem+1
                write(12,*)'Ephonon-Rem',Abs(Wintegrale)
                write(12,*)'  E_sp  |E_sp-E_F|    L    2J      Z        Xrem         Yrem'
                call XY(Wintegrale)
             endif
          else             !E>0
-            if(abs(DispersionFunction(i)- 1.d0/Gadd).lt.abs(DispersionFunction(i-1)- 1.d0/Gadd).and. &
-               abs(DispersionFunction(i)- 1.d0/Gadd).lt.abs(DispersionFunction(i+1)- 1.d0/Gadd).and. &
-           abs(abs(DispersionFunction(i-1)-1.d0/Gadd) &
-            - abs(DispersionFunction(i+1)- 1.d0/Gadd)).lt.1000.*dW )then
+            if( graph_solve(DispersionFunction,i,1.d0/Gadd)  )then
+               NphonAdd = NphonAdd+1
                write(12,*)'Ephonon-Add',Abs(Wintegrale)
                write(12,*)'  E_sp  |E_sp-E_F|    L    2J      Z        Xadd         Yadd'
                call XY(Wintegrale)
@@ -581,6 +573,11 @@
        write(*,*)'Caratteristiche dei Livelli'
        do i=1,Nlivelli
         write(*,*)llk(i),jjk(i),ek(i),Zeta(i)
+        if(e_sp(i) < efn )then
+          LevHole = LevHole + 1
+        else
+          LevPart = LevPart + 1
+        endif
        enddo
 
        write(*,*)
@@ -598,6 +595,15 @@
        write(11,*)'Pairing strength of Pair Addition and Removal phonons'
        write(11,*)'G(a=+2)=',GAdd,'G(a=-2)=',GRem
        write(11,*)
+
+       if(LevHole.ne.NphonRem)then
+         write(11,*)'!! WARNING: Number of hole levels and removal phonons not corresponding'
+         write(11,*)'!! Number of Levels = ', LevHole , 'Number of Phonons =', NphonRem, '!!'
+       endif
+       if(LevPart.ne.NphonAdd)then
+         write(11,*)'!! WARNING: Number of part levels and addition phonons not corresponding'
+         write(11,*)'!! Number of Levels = ', LevPart , 'Number of Phonons =', NphonAdd, '!!'
+       endif
 end subroutine define_minima
 
 !---------------------------------!

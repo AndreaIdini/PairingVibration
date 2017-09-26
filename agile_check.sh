@@ -11,6 +11,14 @@ function check {
      mv buffer.check .buffer_${2}old.check
   else
     echo "check FAILED!"
+    echo "Do you want to substitute checkfiles? [Y/n]"
+    read checkvar
+    if [ "$checkvar" == "Y" ]
+       then
+       echo "substituting"
+       cp $1 .${1%.*}_${2}old.check
+       mv buffer.check .buffer_${2}old.check   
+    fi 
     exit
   fi
   #FI
